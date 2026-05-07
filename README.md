@@ -1,47 +1,13 @@
-# TechProof
+﻿# TechProof
 
-로컬에서 실행되는 Word(.docx) 기술 문서 오타/조사 오류 검출 프로그램 MVP입니다.
+TechProof는 Word(`.docx`) 기술 문서에서 조사/맞춤법 오류를 점검해 주는 JavaFX 기반 데스크톱 앱입니다.
 
-## 기능
+## 다운로드
 
-- `.docx` 파일 불러오기
-- 문단 및 표 안 텍스트 추출
-- 괄호 안 도면부호를 원문에서 제거하지 않고 조사 판단 시에만 무시
-- `은/는`, `이/가`, `을/를` 조사 오류 검출
-- 사용자 오타 사전 기반 오타 검출
-- 결과 테이블 표시
-- CSV 저장
+- [Windows 설치파일 다운로드 (TechProof-0.1.0.exe)](https://github.com/sikdong/techproof/releases/download/v0.1.0/TechProof-0.1.0.exe)
 
-## 실행 방법
+## 설치 방법 (Windows)
 
-Java 21과 Gradle이 설치되어 있어야 합니다.
-
-```bash
-gradle run
-```
-
-## 사전 수정
-
-기본 오타 사전은 아래 파일입니다.
-
-```text
-src/main/resources/dictionary/typo-dictionary.json
-```
-
-예:
-
-```json
-{
-  "잇다": "있다",
-  "됬다": "됐다"
-}
-```
-
-## 패키징 예시
-
-```bash
-gradle clean build
-jpackage --input build/libs --name TechProof --main-jar techproof-0.1.0.jar --type exe
-```
-
-JavaFX 런타임 포함 패키징은 별도 런타임 이미지 구성이 필요할 수 있습니다.
+1. `TechProof-0.1.0.exe`을 실행합니다.
+2. 설치 마법사 안내에 따라 설치를 완료합니다.
+3. 시작 메뉴 또는 바탕화면 바로가기에서 `TechProof`를 실행합니다.

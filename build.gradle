@@ -35,3 +35,84 @@ jar {
 test {
     useJUnitPlatform()
 }
+
+def jpackageExecutable = org.gradle.internal.os.OperatingSystem.current().isWindows() ?
+    "${System.getProperty('java.home')}\\bin\\jpackage.exe" :
+    "${System.getProperty('java.home')}/bin/jpackage"
+
+tasks.register('createExeInstaller', Exec) {
+    group = 'distribution'
+    description = 'Creates a Windows .exe installer using jpackage.'
+    dependsOn installDist
+
+    doFirst {
+        if (!org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+            throw new GradleException('createExeInstaller can only run on Windows.')
+        }
+        if (!file(jpackageExecutable).exists()) {
+            throw new GradleException("jpackage not found: ${jpackageExecutable}")
+        }
+    }
+
+    def appName = 'TechProof'
+    def installDir = layout.buildDirectory.dir("install/${project.name}").get().asFile
+    def libDir = new File(installDir, 'lib')
+    def mainJar = "${project.name}-${project.version}.jar"
+    def outputDir = layout.buildDirectory.dir('installer').get().asFile
+
+    commandLine(
+        jpackageExecutable,
+        '--type', 'exe',
+        '--name', appName,
+        '--dest', outputDir.absolutePath,
+        '--input', libDir.absolutePath,
+        '--main-jar', mainJar,
+        '--main-class', application.mainClass.get(),
+        '--app-version', project.version.toString(),
+        '--vendor', 'TechProof',
+        '--win-shortcut',
+        '--win-menu',
+        '--win-dir-chooser',
+        '--java-options', '--module-path',
+        '--java-options', '$APPDIR',
+        '--java-options', '--add-modules=javafx.controls,javafx.fxml',
+        '--java-options', '-Dfile.encoding=UTF-8'
+    )
+}
+
+tasks.register('createAppImage', Exec) {
+    group = 'distribution'
+    description = 'Creates a Windows app image (portable folder with exe launcher) using jpackage.'
+    dependsOn installDist
+
+    doFirst {
+        if (!org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+            throw new GradleException('createAppImage can only run on Windows.')
+        }
+        if (!file(jpackageExecutable).exists()) {
+            throw new GradleException("jpackage not found: ${jpackageExecutable}")
+        }
+    }
+
+    def appName = 'TechProof'
+    def installDir = layout.buildDirectory.dir("install/${project.name}").get().asFile
+    def libDir = new File(installDir, 'lib')
+    def mainJar = "${project.name}-${project.version}.jar"
+    def outputDir = layout.buildDirectory.dir('app-image').get().asFile
+
+    commandLine(
+        jpackageExecutable,
+        '--type', 'app-image',
+        '--name', appName,
+        '--dest', outputDir.absolutePath,
+        '--input', libDir.absolutePath,
+        '--main-jar', mainJar,
+        '--main-class', application.mainClass.get(),
+        '--app-version', project.version.toString(),
+        '--vendor', 'TechProof',
+        '--java-options', '--module-path',
+        '--java-options', '$APPDIR',
+        '--java-options', '--add-modules=javafx.controls,javafx.fxml',
+        '--java-options', '-Dfile.encoding=UTF-8'
+    )
+}
