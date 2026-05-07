@@ -1,0 +1,38 @@
+[
+  {
+    "wrongPart": "됬",
+    "correctPart": "됐",
+    "reason": "Incorrect past-tense stem form.",
+    "source": {
+      "provider": "국립국어원",
+      "document": "한국어 어문 규범 - 한글 맞춤법",
+      "section": "제4장 형태에 관한 것",
+      "url": "https://www.korean.go.kr/kornorms/main/main.do",
+      "retrievedAt": "2026-05-04"
+    }
+  },
+  {
+    "wrongPart": "되여",
+    "correctPart": "되어",
+    "reason": "Use standard contraction form.",
+    "source": {
+      "provider": "국립국어원",
+      "document": "한국어 어문 규범 - 한글 맞춤법",
+      "section": "제4장 형태에 관한 것",
+      "url": "https://www.korean.go.kr/kornorms/main/main.do",
+      "retrievedAt": "2026-05-04"
+    }
+  },
+  {
+    "wrongPart": "하였",
+    "correctPart": "했",
+    "reason": "Use modern contracted form in plain style.",
+    "source": {
+      "provider": "국립국어원",
+      "document": "한국어 어문 규범 - 한글 맞춤법",
+      "section": "제4장 형태에 관한 것",
+      "url": "https://www.korean.go.kr/kornorms/main/main.do",
+      "retrievedAt": "2026-05-04"
+    }
+  }
+]

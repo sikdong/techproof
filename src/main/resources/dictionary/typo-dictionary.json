@@ -1,0 +1,92 @@
+{
+  "잇다": {
+    "correct": "있다",
+    "source": {
+      "provider": "국립국어원",
+      "dictionary": "표준국어대사전",
+      "query": "있다",
+      "url": "https://stdict.korean.go.kr/search/searchResult.do?searchKeyword=%EC%9E%88%EB%8B%A4",
+      "retrievedAt": "2026-05-04"
+    }
+  },
+  "됬다": {
+    "correct": "됐다",
+    "source": {
+      "provider": "국립국어원",
+      "document": "한국어 어문 규범 - 한글 맞춤법",
+      "section": "제4장 형태에 관한 것",
+      "url": "https://www.korean.go.kr/kornorms/main/main.do",
+      "retrievedAt": "2026-05-04"
+    }
+  },
+  "됀다": {
+    "correct": "된다",
+    "source": {
+      "provider": "국립국어원",
+      "dictionary": "표준국어대사전",
+      "query": "되다",
+      "url": "https://stdict.korean.go.kr/search/searchResult.do?searchKeyword=%EB%90%98%EB%8B%A4",
+      "retrievedAt": "2026-05-04"
+    }
+  },
+  "않됀다": {
+    "correct": "안 된다",
+    "source": {
+      "provider": "국립국어원",
+      "document": "한국어 어문 규범 - 한글 맞춤법",
+      "section": "제5장 띄어쓰기",
+      "url": "https://www.korean.go.kr/kornorms/main/main.do",
+      "retrievedAt": "2026-05-04"
+    }
+  },
+  "돼다": {
+    "correct": "되다",
+    "source": {
+      "provider": "국립국어원",
+      "dictionary": "표준국어대사전",
+      "query": "되다",
+      "url": "https://stdict.korean.go.kr/search/searchResult.do?searchKeyword=%EB%90%98%EB%8B%A4",
+      "retrievedAt": "2026-05-04"
+    }
+  },
+  "되었다": {
+    "correct": "됐다",
+    "source": {
+      "provider": "국립국어원",
+      "document": "한국어 어문 규범 - 한글 맞춤법",
+      "section": "용언 활용과 준말/본말 표기",
+      "url": "https://www.korean.go.kr/kornorms/main/main.do",
+      "retrievedAt": "2026-05-04"
+    }
+  },
+  "하엿다": {
+    "correct": "하였다",
+    "source": {
+      "provider": "국립국어원",
+      "document": "한국어 어문 규범 - 한글 맞춤법",
+      "section": "제4장 형태에 관한 것",
+      "url": "https://www.korean.go.kr/kornorms/main/main.do",
+      "retrievedAt": "2026-05-04"
+    }
+  },
+  "구비됀": {
+    "correct": "구비된",
+    "source": {
+      "provider": "국립국어원",
+      "dictionary": "표준국어대사전",
+      "query": "되다",
+      "url": "https://stdict.korean.go.kr/search/searchResult.do?searchKeyword=%EB%90%98%EB%8B%A4",
+      "retrievedAt": "2026-05-04"
+    }
+  },
+  "포함됀": {
+    "correct": "포함된",
+    "source": {
+      "provider": "국립국어원",
+      "dictionary": "표준국어대사전",
+      "query": "되다",
+      "url": "https://stdict.korean.go.kr/search/searchResult.do?searchKeyword=%EB%90%98%EB%8B%A4",
+      "retrievedAt": "2026-05-04"
+    }
+  }
+}

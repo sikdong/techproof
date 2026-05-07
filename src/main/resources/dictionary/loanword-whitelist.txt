@@ -1,0 +1,7 @@
+﻿# Proper nouns / loanwords to skip from typo check
+KAIST
+OpenAI
+ChatGPT
+카이스트
+오픈에이아이
+챗지피티

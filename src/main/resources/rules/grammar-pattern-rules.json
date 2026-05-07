@@ -1,0 +1,50 @@
+[
+  {
+    "wrong": "되어집니다",
+    "correct": "됩니다",
+    "reason": "Prefer concise passive expression.",
+    "source": {
+      "provider": "국립국어원",
+      "document": "한국어 어문 규범 - 한글 맞춤법",
+      "section": "용언 활용과 피동 표현 점검 규칙",
+      "url": "https://www.korean.go.kr/kornorms/main/main.do",
+      "retrievedAt": "2026-05-04"
+    }
+  },
+  {
+    "wrong": "보여집니다",
+    "correct": "보입니다",
+    "reason": "Prefer concise passive expression.",
+    "source": {
+      "provider": "국립국어원",
+      "document": "한국어 어문 규범 - 한글 맞춤법",
+      "section": "용언 활용과 피동 표현 점검 규칙",
+      "url": "https://www.korean.go.kr/kornorms/main/main.do",
+      "retrievedAt": "2026-05-04"
+    }
+  },
+  {
+    "wrong": "되어진",
+    "correct": "된",
+    "reason": "Avoid redundant 'doe-eojin' pattern.",
+    "source": {
+      "provider": "국립국어원",
+      "document": "한국어 어문 규범 - 한글 맞춤법",
+      "section": "용언 활용과 피동 표현 점검 규칙",
+      "url": "https://www.korean.go.kr/kornorms/main/main.do",
+      "retrievedAt": "2026-05-04"
+    }
+  },
+  {
+    "wrong": "보여지는",
+    "correct": "보이는",
+    "reason": "Avoid redundant passive progressive pattern.",
+    "source": {
+      "provider": "국립국어원",
+      "document": "한국어 어문 규범 - 한글 맞춤법",
+      "section": "용언 활용과 피동 표현 점검 규칙",
+      "url": "https://www.korean.go.kr/kornorms/main/main.do",
+      "retrievedAt": "2026-05-04"
+    }
+  }
+]

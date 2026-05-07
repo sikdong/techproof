@@ -1,0 +1,50 @@
+[
+  {
+    "wrong": "할수",
+    "correct": "할 수",
+    "reason": "Bound noun 'su' should be separated.",
+    "source": {
+      "provider": "국립국어원",
+      "document": "한국어 어문 규범 - 한글 맞춤법",
+      "section": "제5장 띄어쓰기",
+      "url": "https://www.korean.go.kr/kornorms/main/main.do",
+      "retrievedAt": "2026-05-04"
+    }
+  },
+  {
+    "wrong": "될수",
+    "correct": "될 수",
+    "reason": "Bound noun 'su' should be separated.",
+    "source": {
+      "provider": "국립국어원",
+      "document": "한국어 어문 규범 - 한글 맞춤법",
+      "section": "제5장 띄어쓰기",
+      "url": "https://www.korean.go.kr/kornorms/main/main.do",
+      "retrievedAt": "2026-05-04"
+    }
+  },
+  {
+    "wrong": "할것",
+    "correct": "할 것",
+    "reason": "Bound noun 'geot' should be separated.",
+    "source": {
+      "provider": "국립국어원",
+      "document": "한국어 어문 규범 - 한글 맞춤법",
+      "section": "제5장 띄어쓰기",
+      "url": "https://www.korean.go.kr/kornorms/main/main.do",
+      "retrievedAt": "2026-05-04"
+    }
+  },
+  {
+    "wrong": "된것",
+    "correct": "된 것",
+    "reason": "Bound noun 'geot' should be separated.",
+    "source": {
+      "provider": "국립국어원",
+      "document": "한국어 어문 규범 - 한글 맞춤법",
+      "section": "제5장 띄어쓰기",
+      "url": "https://www.korean.go.kr/kornorms/main/main.do",
+      "retrievedAt": "2026-05-04"
+    }
+  }
+]
