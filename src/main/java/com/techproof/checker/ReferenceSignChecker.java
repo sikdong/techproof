@@ -107,7 +107,20 @@ public class ReferenceSignChecker {
             }
         }
 
-        return new ScanResult(results, entries);
+        return new ScanResult(results, deduplicateEntries(entries));
+    }
+
+    private List<ReferenceSignEntry> deduplicateEntries(List<ReferenceSignEntry> entries) {
+        Map<ReferenceEntryKey, ReferenceSignEntry> uniqueEntries = new LinkedHashMap<>();
+        for (ReferenceSignEntry entry : entries) {
+            ReferenceEntryKey key = new ReferenceEntryKey(
+                entry.getName(),
+                entry.getSign(),
+                entry.getExpectedSign()
+            );
+            uniqueEntries.putIfAbsent(key, entry);
+        }
+        return List.copyOf(uniqueEntries.values());
     }
 
     private ReferenceName findMatchedName(List<ReferenceName> referenceNames, Map<String, ReferenceSign> firstSigns) {
@@ -307,5 +320,8 @@ public class ReferenceSignChecker {
     }
 
     private record ScanResult(List<CheckResult> issues, List<ReferenceSignEntry> entries) {
+    }
+
+    private record ReferenceEntryKey(String name, String sign, String expectedSign) {
     }
 }

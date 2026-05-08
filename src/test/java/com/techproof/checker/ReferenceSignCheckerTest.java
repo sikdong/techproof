@@ -129,4 +129,20 @@ class ReferenceSignCheckerTest {
         assertEquals("112", entries.get(1).getExpectedSign());
         assertTrue(entries.get(1).isMismatch());
     }
+
+    @Test
+    void removesDuplicateReferenceSignEntries() {
+        var entries = checker.entries(new ParagraphBlock(
+            1,
+            "body",
+            "유간 검출 장치(100)는 신호를 검출한다. 유간 검출 장치(100)는 다시 신호를 검출한다. "
+                + "유간 검출 장치(110)는 결과를 출력한다. 유간 검출 장치(110)는 다시 결과를 출력한다."
+        ));
+
+        assertEquals(2, entries.size());
+        assertEquals("100", entries.get(0).getSign());
+        assertTrue(!entries.get(0).isMismatch());
+        assertEquals("110", entries.get(1).getSign());
+        assertTrue(entries.get(1).isMismatch());
+    }
 }
