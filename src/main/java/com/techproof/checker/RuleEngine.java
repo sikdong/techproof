@@ -16,9 +16,11 @@ public class RuleEngine {
     private final SpacingChecker spacingChecker = new SpacingChecker();
     private final GrammarPatternChecker grammarPatternChecker = new GrammarPatternChecker();
     private final MorphologyChecker morphologyChecker = new MorphologyChecker();
+    private final ReferenceSignChecker referenceSignChecker = new ReferenceSignChecker();
 
     public List<CheckResult> checkAll(List<ParagraphBlock> blocks) {
         List<CheckResult> results = new ArrayList<>();
+        results.addAll(referenceSignChecker.check(blocks));
         for (ParagraphBlock block : blocks) {
             for (ParagraphBlock sentenceBlock : sentenceSplitter.splitAsParagraphBlocks(block)) {
                 results.addAll(particleChecker.check(sentenceBlock));

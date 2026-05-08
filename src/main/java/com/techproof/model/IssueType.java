@@ -6,7 +6,8 @@ public enum IssueType {
     TYPO("Typo"),
     SPACING("Spacing"),
     GRAMMAR("Grammar"),
-    MORPHOLOGY("Morphology");
+    MORPHOLOGY("Morphology"),
+    REFERENCE_SIGN("Reference Sign");
 
     private final String label;
 
