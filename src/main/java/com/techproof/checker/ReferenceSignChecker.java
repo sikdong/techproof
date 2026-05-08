@@ -3,6 +3,7 @@ package com.techproof.checker;
 import com.techproof.model.CheckResult;
 import com.techproof.model.IssueType;
 import com.techproof.model.ParagraphBlock;
+import com.techproof.model.ReferenceSignEntry;
 import kr.co.shineware.nlp.komoran.constant.DEFAULT_MODEL;
 import kr.co.shineware.nlp.komoran.core.Komoran;
 import kr.co.shineware.nlp.komoran.model.Token;
@@ -35,8 +36,21 @@ public class ReferenceSignChecker {
         return check(List.of(block));
     }
 
+    public List<ReferenceSignEntry> entries(ParagraphBlock block) {
+        return entries(List.of(block));
+    }
+
     public List<CheckResult> check(List<ParagraphBlock> blocks) {
+        return scan(blocks).issues();
+    }
+
+    public List<ReferenceSignEntry> entries(List<ParagraphBlock> blocks) {
+        return scan(blocks).entries();
+    }
+
+    private ScanResult scan(List<ParagraphBlock> blocks) {
         List<CheckResult> results = new ArrayList<>();
+        List<ReferenceSignEntry> entries = new ArrayList<>();
         Map<String, ReferenceSign> firstSigns = new LinkedHashMap<>();
 
         for (ParagraphBlock block : blocks) {
@@ -51,6 +65,17 @@ public class ReferenceSignChecker {
                 String sign = matcher.group(1);
                 ReferenceName matchedName = findMatchedName(referenceNames, firstSigns);
                 ReferenceSign first = matchedName == null ? null : firstSigns.get(matchedName.name());
+                ReferenceName displayName = matchedName == null ? referenceNames.get(0) : matchedName;
+                String expectedSign = first == null ? sign : first.sign();
+
+                entries.add(new ReferenceSignEntry(
+                    block.paragraphNo(),
+                    block.location(),
+                    displayName.name(),
+                    sign,
+                    expectedSign,
+                    TextUtil.context(text, displayName.start(), matcher.end())
+                ));
 
                 if (first == null) {
                     ReferenceName primaryName = referenceNames.get(0);
@@ -82,7 +107,7 @@ public class ReferenceSignChecker {
             }
         }
 
-        return results;
+        return new ScanResult(results, entries);
     }
 
     private ReferenceName findMatchedName(List<ReferenceName> referenceNames, Map<String, ReferenceSign> firstSigns) {
@@ -136,18 +161,22 @@ public class ReferenceSignChecker {
     }
 
     private void removeLeadingGrammarWords(List<WordSpan> words) {
-        while (words.size() > 1 && isGrammaticalPrefix(words.get(0).word())) {
+        while (words.size() > 1 && isPatentLeadingModifier(words.get(0).word())) {
             words.remove(0);
         }
         while (words.size() > 1 && isClauseTail(words.get(0).word())) {
             words.remove(0);
         }
-        while (words.size() > 1 && hasCaseParticle(words.get(0).word())) {
+        while (words.size() > 1 && isRemovableCaseParticlePhrase(words.get(0).word())) {
             words.remove(0);
             while (words.size() > 1 && isClauseTail(words.get(0).word())) {
                 words.remove(0);
             }
         }
+    }
+
+    private boolean isPatentLeadingModifier(String word) {
+        return isGrammaticalPrefix(word) || isRemovableCaseParticlePhrase(word);
     }
 
     private boolean isGrammaticalPrefix(String word) {
@@ -162,16 +191,17 @@ public class ReferenceSignChecker {
             }
 
             boolean hasSubstantive = false;
+            boolean hasNonNamePrefix = false;
             for (Token token : tokens) {
                 String pos = token.getPos();
                 if (isNonNamePrefixPos(pos)) {
-                    return true;
+                    hasNonNamePrefix = true;
                 }
                 if (isSubstantivePos(pos)) {
                     hasSubstantive = true;
                 }
             }
-            return !hasSubstantive;
+            return hasNonNamePrefix && !hasSubstantive;
         } catch (Exception ex) {
             return false;
         }
@@ -255,6 +285,10 @@ public class ReferenceSignChecker {
                 || word.endsWith("에서"));
     }
 
+    private boolean isRemovableCaseParticlePhrase(String word) {
+        return hasCaseParticle(word) && !word.matches("제\\d+의");
+    }
+
     private String joinWords(List<WordSpan> words) {
         List<String> values = new ArrayList<>();
         for (WordSpan word : words) {
@@ -270,5 +304,8 @@ public class ReferenceSignChecker {
     }
 
     private record WordSpan(int start, int end, String word) {
+    }
+
+    private record ScanResult(List<CheckResult> issues, List<ReferenceSignEntry> entries) {
     }
 }

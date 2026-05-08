@@ -64,6 +64,33 @@ class ReferenceSignCheckerTest {
     }
 
     @Test
+    void removesLeadingGrammarWordsByPartOfSpeech2() {
+        List<CheckResult> results = checker.check(List.of(
+                new ParagraphBlock(1, "body", "뉴로모픽 프로세서(120)는 신호를 처리한다."),
+                new ParagraphBlock(2, "body", "상기 뉴로모픽 프로세서(220)는 결과를 출력한다."),
+                new ParagraphBlock(3, "body", "제1 뉴로모픽 프로세서(320)는 결과를 다시 처리한다."),
+                new ParagraphBlock(4, "body", "복수의 뉴로모픽 프로세서(420)는 병렬로 동작한다.")
+        ));
+
+        assertEquals(3, results.size());
+        assertEquals("뉴로모픽 프로세서(220)", results.get(0).getOriginal());
+        assertEquals("뉴로모픽 프로세서(120)", results.get(0).getSuggestion());
+        assertTrue(results.stream().allMatch(r -> r.getSuggestion().equals("뉴로모픽 프로세서(120)")));
+    }
+
+    @Test
+    void keepsOrdinalPossessivePrefixAsPartOfReferenceName() {
+        List<CheckResult> results = checker.check(List.of(
+            new ParagraphBlock(1, "body", "제1의 뉴로모픽 프로세서(120)는 신호를 처리한다."),
+            new ParagraphBlock(2, "body", "제1의 뉴로모픽 프로세서(220)는 결과를 출력한다.")
+        ));
+
+        assertEquals(1, results.size());
+        assertEquals("제1의 뉴로모픽 프로세서(220)", results.get(0).getOriginal());
+        assertEquals("제1의 뉴로모픽 프로세서(120)", results.get(0).getSuggestion());
+    }
+
+    @Test
     void ignoresSameReferenceSignForSameTerm() {
         List<CheckResult> results = checker.check(new ParagraphBlock(
             1,
@@ -83,5 +110,23 @@ class ReferenceSignCheckerTest {
         ));
 
         assertTrue(results.isEmpty());
+    }
+
+    @Test
+    void listsEveryReferenceSignAndMarksMismatches() {
+        var entries = checker.entries(new ParagraphBlock(
+            1,
+            "body",
+            "이미지 인코더(112)는 영상을 처리한다. 이미지 인코더(132)는 결과를 출력한다."
+        ));
+
+        assertEquals(2, entries.size());
+        assertEquals("이미지 인코더", entries.get(0).getName());
+        assertEquals("112", entries.get(0).getSign());
+        assertTrue(!entries.get(0).isMismatch());
+        assertEquals("이미지 인코더", entries.get(1).getName());
+        assertEquals("132", entries.get(1).getSign());
+        assertEquals("112", entries.get(1).getExpectedSign());
+        assertTrue(entries.get(1).isMismatch());
     }
 }

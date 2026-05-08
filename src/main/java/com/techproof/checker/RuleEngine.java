@@ -19,8 +19,18 @@ public class RuleEngine {
     private final ReferenceSignChecker referenceSignChecker = new ReferenceSignChecker();
 
     public List<CheckResult> checkAll(List<ParagraphBlock> blocks) {
+        return checkAll(blocks, (completed, total) -> {
+        });
+    }
+
+    public List<CheckResult> checkAll(List<ParagraphBlock> blocks, ProgressListener progressListener) {
         List<CheckResult> results = new ArrayList<>();
+        int totalSteps = blocks.size() + 1;
+        int completedSteps = 0;
+
         results.addAll(referenceSignChecker.check(blocks));
+        progressListener.onProgress(++completedSteps, totalSteps);
+
         for (ParagraphBlock block : blocks) {
             for (ParagraphBlock sentenceBlock : sentenceSplitter.splitAsParagraphBlocks(block)) {
                 results.addAll(particleChecker.check(sentenceBlock));
@@ -28,8 +38,14 @@ public class RuleEngine {
                 results.addAll(spacingChecker.check(sentenceBlock));
                 results.addAll(grammarPatternChecker.check(sentenceBlock));
             }
+            progressListener.onProgress(++completedSteps, totalSteps);
         }
         results.sort(Comparator.comparingInt(CheckResult::getParagraphNo).thenComparing(CheckResult::getOriginal));
         return results;
+    }
+
+    @FunctionalInterface
+    public interface ProgressListener {
+        void onProgress(int completedSteps, int totalSteps);
     }
 }

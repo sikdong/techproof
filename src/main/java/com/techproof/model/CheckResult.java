@@ -36,6 +36,7 @@ public class CheckResult {
 
     public int getParagraphNo() { return paragraphNo; }
     public String getLocation() { return location; }
+    public IssueType getType() { return type; }
     public String getTypeLabel() { return type.label(); }
     public String getOriginal() { return original; }
     public String getSuggestion() { return suggestion; }
