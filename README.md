@@ -4,7 +4,7 @@ TechProof는 Word(`.docx`) 기술 문서에서 조사/맞춤법 오류를 점검
 
 ## 다운로드
 
-- [Windows 설치파일 다운로드 (TechProof-0.1.0.exe)](https://github.com/sikdong/techproof/releases/download/v0.1.0/TechProof-0.1.0.exe)
+- [Windows 설치파일 다운로드 (TechProof-0.1.0.exe)](https://github.com/sikdong/techproof/releases/download/v0.2.0/TechProof-0.2.0.exe)
 
 ## 설치 방법 (Windows)
 
