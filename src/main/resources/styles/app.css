@@ -1,0 +1,22 @@
+.root {
+    -fx-font-family: "Malgun Gothic", "맑은 고딕", "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+}
+
+.button,
+.combo-box,
+.label,
+.tab-label,
+.table-view,
+.table-cell,
+.table-row-cell,
+.table-view .column-header .label,
+.text-area,
+.dialog-pane {
+    -fx-font-family: "Malgun Gothic", "맑은 고딕", "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+}
+
+.table-view .column-header .label {
+    -fx-font-size: 14px;
+}
