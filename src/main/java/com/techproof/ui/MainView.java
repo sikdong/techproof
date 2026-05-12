@@ -289,11 +289,17 @@ public class MainView {
             CheckRunResult result = task.getValue();
             currentResults = result.issues();
             setResultTables(currentResults, result.referenceEntries());
+            long referenceSignIssueCount = currentResults.stream()
+                .filter(this::isReferenceSignResult)
+                .count();
+            long typoIssueCount = currentResults.size() - referenceSignIssueCount;
             status.setText("Check finished: " + currentResults.size() + " issue(s)");
             setChecking(false);
             showInfo(
                 "TechProof 검사 완료",
-                "검사가 완료되었습니다.\n발견된 오류 후보: " + currentResults.size() + "건"
+                "검사가 완료되었습니다.\n"
+                    + "오타: " + typoIssueCount + "건\n"
+                    + "도면 부호: " + referenceSignIssueCount + "건"
             );
         });
 

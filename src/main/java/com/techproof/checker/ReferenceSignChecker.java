@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 public class ReferenceSignChecker {
     private static final int MAX_NAME_WORDS = 3;
-    private static final Pattern REFERENCE_SIGN_PATTERN = Pattern.compile("\\(\\s*([0-9][0-9A-Za-z-]*)\\s*\\)");
+    private static final Pattern REFERENCE_SIGN_PATTERN = Pattern.compile("\\(\\s*([0-9A-Za-z][0-9A-Za-z-]*)\\s*\\)");
     private static final Pattern WORD_PATTERN = Pattern.compile("[\\p{IsHangul}\\p{IsAlphabetic}\\p{IsDigit}_-]+");
 
     private final Komoran komoran;
@@ -63,6 +63,9 @@ public class ReferenceSignChecker {
                 }
 
                 String sign = matcher.group(1);
+                if (isEnglishWordLabel(sign)) {
+                    continue;
+                }
                 ReferenceName matchedName = findMatchedName(referenceNames, firstSigns);
                 ReferenceSign first = matchedName == null ? null : firstSigns.get(matchedName.name());
                 ReferenceName displayName = matchedName == null ? referenceNames.get(0) : matchedName;
@@ -80,6 +83,9 @@ public class ReferenceSignChecker {
                 if (first == null) {
                     ReferenceName primaryName = referenceNames.get(0);
                     for (ReferenceName referenceName : referenceNames) {
+                        if (referenceName.reducedToSingleWord()) {
+                            continue;
+                        }
                         firstSigns.putIfAbsent(
                             referenceName.name(),
                             new ReferenceSign(sign, block.paragraphNo(), primaryName.wordCount())
@@ -147,6 +153,7 @@ public class ReferenceSignChecker {
 
         int from = Math.max(0, words.size() - MAX_NAME_WORDS);
         List<WordSpan> candidateWords = new ArrayList<>(words.subList(from, words.size()));
+        int originalCandidateWordCount = candidateWords.size();
         removeLeadingGrammarWords(candidateWords);
         if (candidateWords.isEmpty()) {
             return List.of();
@@ -159,7 +166,13 @@ public class ReferenceSignChecker {
             if (name.isBlank()) {
                 continue;
             }
-            referenceNames.add(new ReferenceName(name, suffixWords.get(0).start(), suffixWords.size()));
+            boolean reducedToSingleWord = originalCandidateWordCount > 1 && candidateWords.size() == 1;
+            referenceNames.add(new ReferenceName(
+                name,
+                suffixWords.get(0).start(),
+                suffixWords.size(),
+                reducedToSingleWord
+            ));
         }
         return referenceNames;
     }
@@ -174,22 +187,36 @@ public class ReferenceSignChecker {
     }
 
     private void removeLeadingGrammarWords(List<WordSpan> words) {
-        while (words.size() > 1 && isPatentLeadingModifier(words.get(0).word())) {
+        while (words.size() > 1 && isPatentLeadingModifier(words.get(0).word(), words.size())) {
             words.remove(0);
         }
-        while (words.size() > 1 && isClauseTail(words.get(0).word())) {
+        while (words.size() > 1 && isLeadingConnector(words.get(0).word())) {
+            words.remove(0);
+        }
+        while (words.size() > 1 && isClauseTail(words.get(0).word()) && !isSubstantiveWord(words.get(0).word())) {
             words.remove(0);
         }
         while (words.size() > 1 && isRemovableCaseParticlePhrase(words.get(0).word())) {
             words.remove(0);
-            while (words.size() > 1 && isClauseTail(words.get(0).word())) {
+            while (words.size() > 1 && isLeadingConnector(words.get(0).word())) {
+                words.remove(0);
+            }
+            while (words.size() > 1 && isClauseTail(words.get(0).word()) && !isSubstantiveWord(words.get(0).word())) {
                 words.remove(0);
             }
         }
     }
 
-    private boolean isPatentLeadingModifier(String word) {
-        return isGrammaticalPrefix(word) || isRemovableCaseParticlePhrase(word);
+    private boolean isPatentLeadingModifier(String word, int wordCount) {
+        if (isKnownPatentLeadingModifier(word) || isRemovableCaseParticlePhrase(word)) {
+            return true;
+        }
+        return wordCount > 2 && isGrammaticalPrefix(word);
+    }
+
+    private boolean isKnownPatentLeadingModifier(String word) {
+        return word.equals("상기")
+            || word.matches("제\\d+");
     }
 
     private boolean isGrammaticalPrefix(String word) {
@@ -236,6 +263,31 @@ public class ReferenceSignChecker {
             || pos.equals("SN")
             || pos.equals("SH")
             || pos.equals("XR");
+    }
+
+    private boolean isSubstantiveWord(String word) {
+        if (komoran == null || !containsHangul(word)) {
+            return false;
+        }
+
+        try {
+            return komoran.analyze(word).getTokenList().stream()
+                .anyMatch(token -> isSubstantivePos(token.getPos()));
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    private boolean isLeadingConnector(String word) {
+        return word.equals("\uACFC")
+            || word.equals("\uC640")
+            || word.equals("\uBC0F")
+            || word.equals("\uB610\uB294");
+    }
+
+    private boolean isEnglishWordLabel(String sign) {
+        return sign.matches("[A-Z][A-Za-z-]*")
+            && sign.matches(".*[a-z].*");
     }
 
     private boolean containsHangul(String word) {
@@ -299,7 +351,7 @@ public class ReferenceSignChecker {
     }
 
     private boolean isRemovableCaseParticlePhrase(String word) {
-        return hasCaseParticle(word) && !word.matches("제\\d+의");
+        return hasCaseParticle(word) && !word.matches("제\\d+의") && !isSubstantiveWord(word);
     }
 
     private String joinWords(List<WordSpan> words) {
@@ -310,7 +362,7 @@ public class ReferenceSignChecker {
         return String.join(" ", values);
     }
 
-    private record ReferenceName(String name, int start, int wordCount) {
+    private record ReferenceName(String name, int start, int wordCount, boolean reducedToSingleWord) {
     }
 
     private record ReferenceSign(String sign, int paragraphNo, int sourceWordCount) {

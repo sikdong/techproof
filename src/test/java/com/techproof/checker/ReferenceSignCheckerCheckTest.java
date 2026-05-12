@@ -3,13 +3,12 @@ package com.techproof.checker;
 import com.techproof.model.CheckResult;
 import com.techproof.model.ParagraphBlock;
 import org.junit.jupiter.api.Test;
-
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ReferenceSignCheckerTest {
+class ReferenceSignCheckerCheckTest {
     private final ReferenceSignChecker checker = new ReferenceSignChecker();
 
     @Test
@@ -36,6 +35,54 @@ class ReferenceSignCheckerTest {
         assertEquals(2, results.get(0).getParagraphNo());
         assertEquals("프로세서(220)", results.get(0).getOriginal());
         assertEquals("프로세서(120)", results.get(0).getSuggestion());
+    }
+
+    @Test
+    void detectsDifferentAlphabeticReferenceSignForSameTerm() {
+        List<CheckResult> results = checker.check(List.of(
+            new ParagraphBlock(1, "body", "센서 모듈(10A)은 신호를 감지한다."),
+            new ParagraphBlock(2, "body", "센서 모듈(10B)은 감지 결과를 출력한다.")
+        ));
+
+        assertEquals(1, results.size());
+        assertEquals("센서 모듈(10B)", results.get(0).getOriginal());
+        assertEquals("센서 모듈(10A)", results.get(0).getSuggestion());
+    }
+
+    @Test
+    void detectsDifferentLetterFirstReferenceSignForSameTerm() {
+        List<CheckResult> results = checker.check(List.of(
+            new ParagraphBlock(1, "body", "ILD layer(ILD1) is formed on the substrate."),
+            new ParagraphBlock(2, "body", "ILD layer(ILD2) covers the wiring.")
+        ));
+
+        assertEquals(1, results.size());
+        assertEquals("ILD layer(ILD2)", results.get(0).getOriginal());
+        assertEquals("ILD layer(ILD1)", results.get(0).getSuggestion());
+    }
+
+    @Test
+    void detectsDifferentUppercaseLetterOnlyReferenceSignForSameTerm() {
+        List<CheckResult> results = checker.check(List.of(
+            new ParagraphBlock(1, "body", "gate line(GL) extends in a first direction."),
+            new ParagraphBlock(2, "body", "gate line(DL) crosses the pixel area.")
+        ));
+
+        assertEquals(1, results.size());
+        assertEquals("gate line(DL)", results.get(0).getOriginal());
+        assertEquals("gate line(GL)", results.get(0).getSuggestion());
+    }
+
+    @Test
+    void detectsDifferentLowercaseLetterOnlyReferenceSignForSameTerm() {
+        List<CheckResult> results = checker.check(List.of(
+            new ParagraphBlock(1, "body", "gate line(gl) extends in a first direction."),
+            new ParagraphBlock(2, "body", "gate line(dl) crosses the pixel area.")
+        ));
+
+        assertEquals(1, results.size());
+        assertEquals("gate line(dl)", results.get(0).getOriginal());
+        assertEquals("gate line(gl)", results.get(0).getSuggestion());
     }
 
     @Test
@@ -113,36 +160,26 @@ class ReferenceSignCheckerTest {
     }
 
     @Test
-    void listsEveryReferenceSignAndMarksMismatches() {
-        var entries = checker.entries(new ParagraphBlock(
+    void ignoresParenthesizedEnglishLoanwordLabels() {
+        ParagraphBlock block = new ParagraphBlock(
             1,
             "body",
-            "이미지 인코더(112)는 영상을 처리한다. 이미지 인코더(132)는 결과를 출력한다."
-        ));
+            "기계적 벨로시티(Velocity) 일관성 데이터, 다이나믹 평탄도 데이터, "
+                + "합성 포먼트(Synthetic Formant)를 비교한다."
+        );
 
-        assertEquals(2, entries.size());
-        assertEquals("이미지 인코더", entries.get(0).getName());
-        assertEquals("112", entries.get(0).getSign());
-        assertTrue(!entries.get(0).isMismatch());
-        assertEquals("이미지 인코더", entries.get(1).getName());
-        assertEquals("132", entries.get(1).getSign());
-        assertEquals("112", entries.get(1).getExpectedSign());
-        assertTrue(entries.get(1).isMismatch());
+        assertTrue(checker.check(block).isEmpty());
+        assertTrue(checker.entries(block).isEmpty());
     }
 
     @Test
-    void removesDuplicateReferenceSignEntries() {
-        var entries = checker.entries(new ParagraphBlock(
+    void ignoresDifferentReferenceSignsForDifferentTermsInSamePhrase() {
+        List<CheckResult> results = checker.check(new ParagraphBlock(
             1,
             "body",
-            "유간 검출 장치(100)는 신호를 검출한다. 유간 검출 장치(100)는 다시 신호를 검출한다. "
-                + "유간 검출 장치(110)는 결과를 출력한다. 유간 검출 장치(110)는 다시 결과를 출력한다."
+            "센서 모듈(400)과 통신 모듈(410)"
         ));
 
-        assertEquals(2, entries.size());
-        assertEquals("100", entries.get(0).getSign());
-        assertTrue(!entries.get(0).isMismatch());
-        assertEquals("110", entries.get(1).getSign());
-        assertTrue(entries.get(1).isMismatch());
+        assertTrue(results.isEmpty());
     }
 }
