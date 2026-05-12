@@ -49,7 +49,7 @@ public class ReferenceSignChecker {
     }
 
     private ScanResult scan(List<ParagraphBlock> blocks) {
-        List<CheckResult> results = new ArrayList<>();
+        Map<ReferenceIssueKey, CheckResult> results = new LinkedHashMap<>();
         List<ReferenceSignEntry> entries = new ArrayList<>();
         Map<String, ReferenceSign> firstSigns = new LinkedHashMap<>();
 
@@ -100,7 +100,8 @@ public class ReferenceSignChecker {
 
                 String original = text.substring(matchedName.start(), matcher.end());
                 String suggestion = matchedName.name() + "(" + first.sign() + ")";
-                results.add(new CheckResult(
+                ReferenceIssueKey issueKey = new ReferenceIssueKey(matchedName.name(), sign, first.sign());
+                results.putIfAbsent(issueKey, new CheckResult(
                     block.paragraphNo(),
                     block.location(),
                     IssueType.REFERENCE_SIGN,
@@ -113,7 +114,7 @@ public class ReferenceSignChecker {
             }
         }
 
-        return new ScanResult(results, deduplicateEntries(entries));
+        return new ScanResult(List.copyOf(results.values()), deduplicateEntries(entries));
     }
 
     private List<ReferenceSignEntry> deduplicateEntries(List<ReferenceSignEntry> entries) {
@@ -375,5 +376,8 @@ public class ReferenceSignChecker {
     }
 
     private record ReferenceEntryKey(String name, String sign, String expectedSign) {
+    }
+
+    private record ReferenceIssueKey(String name, String sign, String expectedSign) {
     }
 }

@@ -50,7 +50,7 @@ public class ParticleChecker {
             String nounPhrase = matcher.group(1);
             String drawingNo = matcher.group(2) == null ? "" : matcher.group(2);
             String particle = matcher.group(3);
-            if (!isParticleToken(posTokens, matcher.start(3), matcher.end(3), particle)) {
+            if (!isParticleToken(text, posTokens, matcher.start(3), matcher.end(3), particle)) {
                 continue;
             }
 
@@ -88,17 +88,59 @@ public class ParticleChecker {
         return results;
     }
 
-    private boolean isParticleToken(List<Token> posTokens, int start, int end, String particle) {
+    private boolean isParticleToken(String text, List<Token> posTokens, int start, int end, String particle) {
         if (komoran == null || posTokens.isEmpty()) {
             return true;
         }
 
+        boolean hasPreviousNounToken = false;
         for (Token token : posTokens) {
             if (token.getBeginIndex() == start && token.getEndIndex() == end && particle.equals(token.getMorph())) {
-                return token.getPos().startsWith("J");
+                if (token.getPos().startsWith("J")) {
+                    return true;
+                }
+                if (isObjectParticle(particle) && isObjectParticleAnalysis(token, particle)) {
+                    return true;
+                }
+                if (isObjectParticle(particle) && isAfterDrawingMarker(text, start) && token.getPos().startsWith("E")) {
+                    return true;
+                }
+            }
+            if (token.getEndIndex() == start && isNounLikeToken(token)) {
+                hasPreviousNounToken = true;
+            }
+        }
+
+        if (!isObjectParticle(particle) || !hasPreviousNounToken) {
+            return false;
+        }
+
+        for (Token token : posTokens) {
+            if (token.getBeginIndex() == start && token.getEndIndex() == end && isObjectParticleAnalysis(token, particle)) {
+                return true;
             }
         }
         return false;
+    }
+
+    private boolean isNounLikeToken(Token token) {
+        String pos = token.getPos();
+        return pos.startsWith("N") || "SN".equals(pos) || "SL".equals(pos);
+    }
+
+    private boolean isObjectParticle(String particle) {
+        return "\uC744".equals(particle) || "\uB97C".equals(particle);
+    }
+
+    private boolean isAfterDrawingMarker(String text, int start) {
+        return start > 0 && text.charAt(start - 1) == ')';
+    }
+
+    private boolean isObjectParticleAnalysis(Token token, String particle) {
+        if (particle.equals(token.getMorph()) && token.getPos().startsWith("N")) {
+            return true;
+        }
+        return "\uB97C".equals(particle) && "\u3139".equals(token.getMorph()) && token.getPos().startsWith("J");
     }
 
     private FinalSound finalSound(String text) {

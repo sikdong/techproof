@@ -182,4 +182,18 @@ class ReferenceSignCheckerCheckTest {
 
         assertTrue(results.isEmpty());
     }
+
+    @Test
+    void countsRepeatedSameReferenceSignMismatchOnce() {
+        List<CheckResult> results = checker.check(new ParagraphBlock(
+            1,
+            "body",
+            "gap detector(100) detects a signal. gap detector(110) detects another signal. "
+                + "gap detector(110) detects the signal again."
+        ));
+
+        assertEquals(1, results.size());
+        assertEquals("gap detector(110)", results.get(0).getOriginal());
+        assertEquals("gap detector(100)", results.get(0).getSuggestion());
+    }
 }

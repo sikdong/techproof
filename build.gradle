@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.techproof'
-version = '0.2.2'
+version = '0.2.3'
 
 java {
     toolchain { languageVersion = JavaLanguageVersion.of(21) }
@@ -86,6 +86,13 @@ tasks.register('createAppImage', Exec) {
     description = 'Creates a Windows app image (portable folder with exe launcher) using jpackage.'
     dependsOn installDist
 
+    def appName = 'TechProof'
+    def installDir = layout.buildDirectory.dir("install/${project.name}").get().asFile
+    def libDir = new File(installDir, 'lib')
+    def mainJar = "${project.name}-${project.version}.jar"
+    def outputDir = layout.buildDirectory.dir('app-image').get().asFile
+    def appImageDir = new File(outputDir, appName)
+
     doFirst {
         if (!org.gradle.internal.os.OperatingSystem.current().isWindows()) {
             throw new GradleException('createAppImage can only run on Windows.')
@@ -93,13 +100,8 @@ tasks.register('createAppImage', Exec) {
         if (!file(jpackageExecutable).exists()) {
             throw new GradleException("jpackage not found: ${jpackageExecutable}")
         }
+        delete appImageDir
     }
-
-    def appName = 'TechProof'
-    def installDir = layout.buildDirectory.dir("install/${project.name}").get().asFile
-    def libDir = new File(installDir, 'lib')
-    def mainJar = "${project.name}-${project.version}.jar"
-    def outputDir = layout.buildDirectory.dir('app-image').get().asFile
 
     commandLine(
         jpackageExecutable,

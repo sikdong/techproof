@@ -45,4 +45,22 @@ class ParticleCheckerTest {
         assertEquals("도1는", results.get(0).getOriginal());
         assertEquals("도1은", results.get(0).getSuggestion());
     }
+
+    @Test
+    void detectsObjectParticleMismatchAfterBatchim() {
+        List<CheckResult> results = checker.check(new ParagraphBlock(1, "본문 S1", "버스(150)을 입력한다."));
+
+        assertEquals(1, results.size());
+        assertEquals("버스(150)을", results.get(0).getOriginal());
+        assertEquals("버스(150)를", results.get(0).getSuggestion());
+    }
+
+    @Test
+    void detectsObjectParticleMismatchAfterVowel() {
+        List<CheckResult> results = checker.check(new ParagraphBlock(1, "본문 S1", "센서을 연결한다."));
+
+        assertEquals(1, results.size());
+        assertEquals("센서을", results.get(0).getOriginal());
+        assertEquals("센서를", results.get(0).getSuggestion());
+    }
 }
