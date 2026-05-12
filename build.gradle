@@ -30,7 +30,13 @@ dependencies {
 }
 
 jar {
-    manifest { attributes 'Main-Class': application.mainClass }
+    manifest {
+        attributes(
+            'Main-Class': application.mainClass,
+            'Implementation-Title': 'TechProof',
+            'Implementation-Version': project.version
+        )
+    }
 }
 
 test {

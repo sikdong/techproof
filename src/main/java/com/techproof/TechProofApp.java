@@ -1,11 +1,14 @@
 package com.techproof;
 
 import com.techproof.ui.MainView;
+import com.techproof.update.UpdateNotifier;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class TechProofApp extends Application {
+    private static final String FALLBACK_VERSION = "0.2.3";
+
     @Override
     public void start(Stage stage) {
         MainView mainView = new MainView(stage);
@@ -17,9 +20,15 @@ public class TechProofApp extends Application {
         stage.setTitle("TechProof - 기술 문서 오타/도면부호 검사기");
         stage.setScene(scene);
         stage.show();
+        UpdateNotifier.checkForUpdates(stage, getHostServices(), currentVersion());
     }
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    private String currentVersion() {
+        String version = TechProofApp.class.getPackage().getImplementationVersion();
+        return version == null || version.isBlank() ? FALLBACK_VERSION : version;
     }
 }
