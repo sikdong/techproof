@@ -4,11 +4,19 @@ TechProof는 Word(`.docx`, `.doc`) 기술 문서에서 조사/맞춤법 오류�
 
 ## 다운로드
 
-- [Windows 설치파일 다운로드 (TechProof-0.2.3.exe)](https://github.com/sikdong/techproof/releases/download/v0.2.3/TechProof-0.2.3.exe)
+- [Windows 설치파일 다운로드 (TechProof-0.2.4.exe)](https://github.com/sikdong/techproof/releases/download/v0.2.4/TechProof-0.2.4.exe)
 
 ## 버전별 변경 사항
 
 <details open>
+<summary>v0.2.4</summary>
+
+- 도면부호 명칭 추출 시 괄호 앞 1~2어절 문맥은 유지하되, 앞쪽 어절 말미의 `은/는/이/가/을/를` 조사는 명칭에서 제외
+- `제3`, `제10` 등 다양한 서수형 명칭이 도면부호 명칭에서 제거되지 않도록 보존
+
+</details>
+
+<details>
 <summary>v0.2.3</summary>
 
 - 조사 검사에서 `은/는/이/가`에 더해 `을/를` 받침 오류 인식 지원
@@ -57,6 +65,6 @@ TechProof는 Word(`.docx`, `.doc`) 기술 문서에서 조사/맞춤법 오류�
 
 ## 설치 방법 (Windows)
 
-1. `TechProof-0.2.3.exe`을 실행합니다.
+1. `TechProof-0.2.4.exe`을 실행합니다.
 2. 설치 마법사 안내에 따라 설치를 완료합니다.
 3. 시작 메뉴 또는 바탕화면 바로가기에서 `TechProof`를 실행합니다.
