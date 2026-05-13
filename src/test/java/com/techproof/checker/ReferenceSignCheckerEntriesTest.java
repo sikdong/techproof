@@ -131,4 +131,36 @@ class ReferenceSignCheckerEntriesTest {
         assertEquals("110", entries.get(1).getSign());
         assertTrue(entries.get(1).isMismatch());
     }
+
+    @Test
+    void removesCaseMarkedContextWordsBeforeReferenceNames() {
+        var entries = checker.entries(new ParagraphBlock(
+            1,
+            "body",
+            "4a는 제1 도파관(P1)을 포함한다. "
+                + "4b는 제1 도파관(P1)과 연결된다. "
+                + "7에서는 제1 도파관(P1)이 표시된다. "
+                + "은 제1 도파관(P1)을 가리킨다."
+        ));
+
+        assertEquals(1, entries.size());
+        assertEquals("제1 도파관", entries.get(0).getName());
+        assertEquals("P1", entries.get(0).getSign());
+    }
+
+    @Test
+    void keepsVariousOrdinalReferenceNamesAfterCaseMarkedContextWords() {
+        var entries = checker.entries(new ParagraphBlock(
+            1,
+            "body",
+            "4a는 제3 도파관(P3)을 포함한다. "
+                + "7에서는 제10 도파관(P10)이 표시된다."
+        ));
+
+        assertEquals(2, entries.size());
+        assertEquals("제3 도파관", entries.get(0).getName());
+        assertEquals("P3", entries.get(0).getSign());
+        assertEquals("제10 도파관", entries.get(1).getName());
+        assertEquals("P10", entries.get(1).getSign());
+    }
 }

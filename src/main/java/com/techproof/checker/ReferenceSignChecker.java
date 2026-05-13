@@ -188,6 +188,7 @@ public class ReferenceSignChecker {
     }
 
     private void removeLeadingGrammarWords(List<WordSpan> words) {
+        removeLeadingCaseMarkedContextWords(words);
         while (words.size() > 1 && isPatentLeadingModifier(words.get(0).word(), words.size())) {
             words.remove(0);
         }
@@ -208,11 +209,65 @@ public class ReferenceSignChecker {
         }
     }
 
+    private void removeLeadingCaseMarkedContextWords(List<WordSpan> words) {
+        while (words.size() > 1) {
+            String first = words.get(0).word();
+            if (isLeadingDrawingContextMarker(first, words)) {
+                words.remove(0);
+                continue;
+            }
+            if (hasTrailingCaseParticle(first)) {
+                words.remove(0);
+                continue;
+            }
+            break;
+        }
+    }
+
+    private boolean isLeadingDrawingContextMarker(String word, List<WordSpan> words) {
+        return "도".equals(word)
+            && words.size() > 2
+            && hasTrailingCaseParticle(words.get(1).word());
+    }
+
+    private boolean hasTrailingCaseParticle(String word) {
+        if (word == null || word.isBlank()) {
+            return false;
+        }
+        return isStandaloneCaseParticle(word)
+            || (word.length() > 1 && endsWithCaseParticle(word));
+    }
+
+    private boolean isStandaloneCaseParticle(String word) {
+        return "은".equals(word)
+            || "는".equals(word)
+            || "이".equals(word)
+            || "가".equals(word)
+            || "을".equals(word)
+            || "를".equals(word);
+    }
+
+    private boolean endsWithCaseParticle(String word) {
+        return word.endsWith("은")
+            || word.endsWith("는")
+            || word.endsWith("이")
+            || word.endsWith("가")
+            || word.endsWith("을")
+            || word.endsWith("를");
+    }
+
     private boolean isPatentLeadingModifier(String word, int wordCount) {
+        if (isOrdinalReferenceNamePart(word)) {
+            return false;
+        }
         if (isKnownPatentLeadingModifier(word) || isRemovableCaseParticlePhrase(word)) {
             return true;
         }
         return wordCount > 2 && isGrammaticalPrefix(word);
+    }
+
+    private boolean isOrdinalReferenceNamePart(String word) {
+        return word != null && word.matches("제[0-9A-Za-z-]+");
     }
 
     private boolean isKnownPatentLeadingModifier(String word) {
@@ -280,10 +335,10 @@ public class ReferenceSignChecker {
     }
 
     private boolean isLeadingConnector(String word) {
-        return word.equals("\uACFC")
-            || word.equals("\uC640")
-            || word.equals("\uBC0F")
-            || word.equals("\uB610\uB294");
+        return word.equals("과")
+            || word.equals("와")
+            || word.equals("및")
+            || word.equals("또는");
     }
 
     private boolean isEnglishWordLabel(String sign) {
