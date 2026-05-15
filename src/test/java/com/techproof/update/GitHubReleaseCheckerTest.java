@@ -16,30 +16,33 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GitHubReleaseCheckerTest {
+    private static final String CURRENT_VERSION = "1.2.3";
+    private static final String NEWER_VERSION = "1.2.4";
+
     private final GitHubReleaseChecker checker = new GitHubReleaseChecker(HttpClient.newHttpClient(), new ObjectMapper());
 
     @Test
     void parsesNewerReleaseWithInstallerAsset() {
         String body = """
             {
-              "tag_name": "v0.2.4",
-              "name": "TechProof v0.2.4",
+              "tag_name": "v1.2.4",
+              "name": "TechProof v1.2.4",
               "body": "- 새 버전 알림 추가",
-              "html_url": "https://github.com/sikdong/techproof/releases/tag/v0.2.4",
+              "html_url": "https://github.com/sikdong/techproof/releases/tag/v1.2.4",
               "assets": [
                 {
-                  "name": "TechProof-0.2.4.exe",
-                  "browser_download_url": "https://github.com/sikdong/techproof/releases/download/v0.2.4/TechProof-0.2.4.exe"
+                  "name": "TechProof-1.2.4.exe",
+                  "browser_download_url": "https://github.com/sikdong/techproof/releases/download/v1.2.4/TechProof-1.2.4.exe"
                 }
               ]
             }
             """;
 
-        Optional<ReleaseInfo> result = checker.parseResponse(response(200, body), "0.2.3");
+        Optional<ReleaseInfo> result = checker.parseResponse(response(200, body), CURRENT_VERSION);
 
         assertTrue(result.isPresent());
-        assertEquals("0.2.4", result.get().version());
-        assertEquals("https://github.com/sikdong/techproof/releases/download/v0.2.4/TechProof-0.2.4.exe",
+        assertEquals(NEWER_VERSION, result.get().version());
+        assertEquals("https://github.com/sikdong/techproof/releases/download/v1.2.4/TechProof-1.2.4.exe",
             result.get().downloadUrl());
     }
 
@@ -47,15 +50,15 @@ class GitHubReleaseCheckerTest {
     void ignoresCurrentOrOlderRelease() {
         String body = """
             {
-              "tag_name": "v0.2.3",
-              "name": "TechProof v0.2.3",
+              "tag_name": "v1.2.3",
+              "name": "TechProof v1.2.3",
               "body": "",
-              "html_url": "https://github.com/sikdong/techproof/releases/tag/v0.2.3",
+              "html_url": "https://github.com/sikdong/techproof/releases/tag/v1.2.3",
               "assets": []
             }
             """;
 
-        Optional<ReleaseInfo> result = checker.parseResponse(response(200, body), "0.2.3");
+        Optional<ReleaseInfo> result = checker.parseResponse(response(200, body), CURRENT_VERSION);
 
         assertTrue(result.isEmpty());
     }

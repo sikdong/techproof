@@ -7,7 +7,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class TechProofApp extends Application {
-    private static final String FALLBACK_VERSION = "0.2.3";
+    static final String FALLBACK_VERSION = "0.2.5";
 
     @Override
     public void start(Stage stage) {
@@ -29,6 +29,12 @@ public class TechProofApp extends Application {
 
     private String currentVersion() {
         String version = TechProofApp.class.getPackage().getImplementationVersion();
-        return version == null || version.isBlank() ? FALLBACK_VERSION : version;
+        return resolveCurrentVersion(version);
+    }
+
+    static String resolveCurrentVersion(String implementationVersion) {
+        return implementationVersion == null || implementationVersion.isBlank()
+            ? FALLBACK_VERSION
+            : implementationVersion;
     }
 }

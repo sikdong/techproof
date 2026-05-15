@@ -16,7 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ReferenceSignChecker {
-    private static final int MAX_NAME_WORDS = 3;
+    private static final int MAX_NAME_WORDS = 4;
     private static final Pattern REFERENCE_SIGN_PATTERN = Pattern.compile("\\(\\s*([0-9A-Za-z][0-9A-Za-z-]*)\\s*\\)");
     private static final Pattern WORD_PATTERN = Pattern.compile("[\\p{IsHangul}\\p{IsAlphabetic}\\p{IsDigit}_-]+");
 
@@ -83,7 +83,9 @@ public class ReferenceSignChecker {
                 if (first == null) {
                     ReferenceName primaryName = referenceNames.get(0);
                     for (ReferenceName referenceName : referenceNames) {
-                        if (referenceName.reducedToSingleWord()) {
+                        if (referenceName.reducedToSingleWord()
+                            || (hasLeadingOrdinalReferenceNamePart(referenceNames.get(0))
+                                && referenceName != referenceNames.get(0))) {
                             continue;
                         }
                         firstSigns.putIfAbsent(
@@ -131,6 +133,12 @@ public class ReferenceSignChecker {
     }
 
     private ReferenceName findMatchedName(List<ReferenceName> referenceNames, Map<String, ReferenceSign> firstSigns) {
+        if (hasLeadingOrdinalReferenceNamePart(referenceNames.get(0))) {
+            ReferenceName primaryName = referenceNames.get(0);
+            ReferenceSign first = firstSigns.get(primaryName.name());
+            return first == null ? null : primaryName;
+        }
+
         for (ReferenceName referenceName : referenceNames) {
             ReferenceSign first = firstSigns.get(referenceName.name());
             if (first != null && referenceName.wordCount() >= first.sourceWordCount()) {
@@ -138,6 +146,11 @@ public class ReferenceSignChecker {
             }
         }
         return null;
+    }
+
+    private boolean hasLeadingOrdinalReferenceNamePart(ReferenceName referenceName) {
+        return !referenceName.name().isBlank()
+            && isOrdinalReferenceNamePart(referenceName.name().split("\\s+", 2)[0]);
     }
 
     private List<ReferenceName> extractReferenceNames(String text, int openParenIndex) {
@@ -153,8 +166,12 @@ public class ReferenceSignChecker {
         }
 
         int from = Math.max(0, words.size() - MAX_NAME_WORDS);
+        if (from > 0 && isOrdinalReferenceNamePart(words.get(from - 1).word())) {
+            from--;
+        }
         List<WordSpan> candidateWords = new ArrayList<>(words.subList(from, words.size()));
         int originalCandidateWordCount = candidateWords.size();
+        removeWordsBeforeLastCaseParticle(candidateWords);
         removeLeadingGrammarWords(candidateWords);
         if (candidateWords.isEmpty()) {
             return List.of();
@@ -176,6 +193,19 @@ public class ReferenceSignChecker {
             ));
         }
         return referenceNames;
+    }
+
+    private void removeWordsBeforeLastCaseParticle(List<WordSpan> words) {
+        int lastParticleIndex = -1;
+        for (int i = 0; i < words.size() - 1; i++) {
+            if (hasTrailingCaseParticle(words.get(i).word())) {
+                lastParticleIndex = i;
+            }
+        }
+        if (lastParticleIndex < 0) {
+            return;
+        }
+        words.subList(0, lastParticleIndex + 1).clear();
     }
 
     private List<WordSpan> extractWords(String prefix, int offset) {

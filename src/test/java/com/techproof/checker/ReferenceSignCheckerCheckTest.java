@@ -86,19 +86,17 @@ class ReferenceSignCheckerCheckTest {
     }
 
     @Test
-    void detectsDifferentReferenceSignForThreeWordTerm() {
+    void doesNotMatchOrdinalPrefixedTermToUnprefixedTerm() {
         List<CheckResult> results = checker.check(List.of(
             new ParagraphBlock(1, "body", "제1 신호 처리 프로세서(120)는 입력 신호를 처리한다."),
             new ParagraphBlock(2, "body", "신호 처리 프로세서(220)는 결과를 출력한다.")
         ));
 
-        assertEquals(1, results.size());
-        assertEquals("신호 처리 프로세서(220)", results.get(0).getOriginal());
-        assertEquals("신호 처리 프로세서(120)", results.get(0).getSuggestion());
+        assertTrue(results.isEmpty());
     }
 
     @Test
-    void removesLeadingGrammarWordsByPartOfSpeech() {
+    void keepsOrdinalPrefixedTermSeparateWhenRemovingLeadingGrammarWords() {
         List<CheckResult> results = checker.check(List.of(
             new ParagraphBlock(1, "body", "프로세서(120)는 신호를 처리한다."),
             new ParagraphBlock(2, "body", "상기 프로세서(220)는 결과를 출력한다."),
@@ -106,12 +104,12 @@ class ReferenceSignCheckerCheckTest {
             new ParagraphBlock(4, "body", "복수의 프로세서(420)는 병렬로 동작한다.")
         ));
 
-        assertEquals(3, results.size());
+        assertEquals(2, results.size());
         assertTrue(results.stream().allMatch(r -> r.getSuggestion().equals("프로세서(120)")));
     }
 
     @Test
-    void removesLeadingGrammarWordsByPartOfSpeech2() {
+    void keepsOrdinalPrefixedMultiWordTermSeparateWhenRemovingLeadingGrammarWords() {
         List<CheckResult> results = checker.check(List.of(
                 new ParagraphBlock(1, "body", "뉴로모픽 프로세서(120)는 신호를 처리한다."),
                 new ParagraphBlock(2, "body", "상기 뉴로모픽 프로세서(220)는 결과를 출력한다."),
@@ -119,7 +117,7 @@ class ReferenceSignCheckerCheckTest {
                 new ParagraphBlock(4, "body", "복수의 뉴로모픽 프로세서(420)는 병렬로 동작한다.")
         ));
 
-        assertEquals(3, results.size());
+        assertEquals(2, results.size());
         assertEquals("뉴로모픽 프로세서(220)", results.get(0).getOriginal());
         assertEquals("뉴로모픽 프로세서(120)", results.get(0).getSuggestion());
         assertTrue(results.stream().allMatch(r -> r.getSuggestion().equals("뉴로모픽 프로세서(120)")));
@@ -195,5 +193,16 @@ class ReferenceSignCheckerCheckTest {
         assertEquals(1, results.size());
         assertEquals("gap detector(110)", results.get(0).getOriginal());
         assertEquals("gap detector(100)", results.get(0).getSuggestion());
+    }
+
+    @Test
+    void ignoresOrdinalBufferLayersWithDifferentReferenceSigns() {
+        List<CheckResult> results = checker.check(new ParagraphBlock(
+            1,
+            "body",
+            "버퍼층(BF)과 제1 버퍼층(BF1) 과 제2 버퍼층(BF2)는 기판 상에 배치된다."
+        ));
+
+        assertTrue(results.isEmpty());
     }
 }

@@ -4,11 +4,21 @@ TechProof는 Word(`.docx`, `.doc`) 기술 문서에서 조사/맞춤법 오류�
 
 ## 다운로드
 
-- [Windows 설치파일 다운로드 (TechProof-0.2.4.exe)](https://github.com/sikdong/techproof/releases/download/v0.2.4/TechProof-0.2.4.exe)
+- [Windows 설치파일 다운로드 (TechProof-0.2.5.exe)](https://github.com/sikdong/techproof/releases/download/v0.2.5/TechProof-0.2.5.exe)
 
 ## 버전별 변경 사항
 
 <details open>
+<summary>v0.2.5</summary>
+
+- 도면부호 명칭 추출 범위를 최대 4어절로 확장
+- `버퍼층(BF)`, `제1 버퍼층(BF1)`, `제2 버퍼층(BF2)`처럼 서수형 명칭을 별개 도면부호로 구분
+- 도면부호 앞 후보 어절에 조사가 있으면 조사 뒤 어절부터 명칭으로 인식
+- 최신 버전 실행 중에도 업데이트 알림이 뜨는 fallback 버전 불일치 수정
+
+</details>
+
+<details>
 <summary>v0.2.4</summary>
 
 - 도면부호 명칭 추출 시 괄호 앞 1~2어절 문맥은 유지하되, 앞쪽 어절 말미의 `은/는/이/가/을/를` 조사는 명칭에서 제외
@@ -65,6 +75,6 @@ TechProof는 Word(`.docx`, `.doc`) 기술 문서에서 조사/맞춤법 오류�
 
 ## 설치 방법 (Windows)
 
-1. `TechProof-0.2.4.exe`을 실행합니다.
+1. `TechProof-0.2.5.exe`을 실행합니다.
 2. 설치 마법사 안내에 따라 설치를 완료합니다.
 3. 시작 메뉴 또는 바탕화면 바로가기에서 `TechProof`를 실행합니다.

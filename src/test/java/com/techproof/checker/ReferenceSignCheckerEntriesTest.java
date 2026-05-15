@@ -163,4 +163,40 @@ class ReferenceSignCheckerEntriesTest {
         assertEquals("제10 도파관", entries.get(1).getName());
         assertEquals("P10", entries.get(1).getSign());
     }
+
+    @Test
+    void marksOrdinalBufferLayersWithDifferentSignsAsMatches() {
+        var entries = checker.entries(new ParagraphBlock(
+            1,
+            "body",
+            "버퍼층(BF)과 제1 버퍼층(BF1) 과 제2 버퍼층(BF2)는 기판 상에 배치된다."
+        ));
+
+        assertEquals(3, entries.size());
+        assertEquals("버퍼층", entries.get(0).getName());
+        assertEquals("BF", entries.get(0).getSign());
+        assertTrue(!entries.get(0).isMismatch());
+        assertEquals("제1 버퍼층", entries.get(1).getName());
+        assertEquals("BF1", entries.get(1).getSign());
+        assertTrue(!entries.get(1).isMismatch());
+        assertEquals("제2 버퍼층", entries.get(2).getName());
+        assertEquals("BF2", entries.get(2).getSign());
+        assertTrue(!entries.get(2).isMismatch());
+    }
+
+    @Test
+    void startsReferenceNameAfterCaseMarkedContextWordWithinFourWords() {
+        var entries = checker.entries(new ParagraphBlock(
+            1,
+            "body",
+            "신호를 제1 버퍼층(BF1)에 제공하고 데이터를 제2 버퍼층(BF2)에 저장한다."
+        ));
+
+        assertEquals(2, entries.size());
+        assertEquals("제1 버퍼층", entries.get(0).getName());
+        assertEquals("BF1", entries.get(0).getSign());
+        assertEquals("제2 버퍼층", entries.get(1).getName());
+        assertEquals("BF2", entries.get(1).getSign());
+        assertTrue(entries.stream().allMatch(entry -> !entry.isMismatch()));
+    }
 }
