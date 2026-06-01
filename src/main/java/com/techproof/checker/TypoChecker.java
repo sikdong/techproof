@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 public class TypoChecker {
     private static final Pattern TOKEN_PATTERN = Pattern.compile("[\\p{IsHangul}\\p{IsAlphabetic}\\p{IsDigit}]+");
+    private static final Pattern CONTEXTUAL_DI_PATTERN = Pattern.compile("([\\p{IsHangul}]{2,}디)(\\s+)([\\p{IsHangul}]+)");
     private static final SourceInfo SPELLING_SOURCE = new SourceInfo(
         "국립국어원",
         "한국어 어문 규범 - 한글 맞춤법",
@@ -51,6 +52,19 @@ public class TypoChecker {
     private static final Set<String> DOUBLE_JOSA = Set.of(
         "\uC5D0\uC11C", "\uC5D0\uAC8C", "\uC5D0\uAC8C\uC11C", "\uC73C\uB85C", "\uB85C\uC11C", "\uB85C", "\uB9CC", "\uAE4C\uC9C0", "\uBD80\uD130"
     );
+    private static final Set<String> DI_EXCEPTION_WORDS = Set.of(
+        "어디", "부디", "잔디", "마디", "반디", "깍디", "꼭디"
+    );
+    private static final List<String> PASSIVE_CONTEXT_STEMS = List.of(
+        "수행", "생성", "갱신", "저장", "출력", "제공", "검출", "산출", "결정", "선택",
+        "적용", "표시", "전송", "수신", "변경", "설정", "변환", "연산", "계산", "비교",
+        "판단", "제어", "처리", "분리", "결합", "연결", "배치", "삽입", "삭제", "추출"
+    );
+    private static final List<String> OBJECT_CONTEXT_PREFIXES = List.of(
+        "수행하", "생성하", "갱신하", "저장하", "출력하", "제공하", "검출하", "산출하", "결정하", "선택하",
+        "적용하", "표시하", "전송하", "수신하", "변경하", "설정하", "변환하", "연산하", "계산하", "비교하",
+        "판단하", "제어하", "처리하", "포함하", "구비하", "획득하", "추출하", "분리하", "결합하", "연결하"
+    );
 
     private final TypoDictionary dictionary;
     private final Set<String> loanwordWhitelist;
@@ -77,6 +91,7 @@ public class TypoChecker {
         List<Token> posTokens = komoran == null ? List.of() : komoran.analyze(text).getTokenList();
 
         addDictionaryPhraseResults(block, results, seen, occupiedSpans);
+        addContextualDiTypoResults(block, results, seen, occupiedSpans);
 
         while (tokenMatcher.find()) {
             String token = tokenMatcher.group();
@@ -195,6 +210,79 @@ public class TypoChecker {
                 );
             }
         }
+    }
+
+    private void addContextualDiTypoResults(
+        ParagraphBlock block,
+        List<CheckResult> results,
+        Set<String> seen,
+        List<Span> occupiedSpans
+    ) {
+        String text = block.text();
+        Matcher matcher = CONTEXTUAL_DI_PATTERN.matcher(text);
+
+        while (matcher.find()) {
+            String original = matcher.group(1);
+            String nextWord = matcher.group(3);
+            if (DI_EXCEPTION_WORDS.contains(original)) {
+                continue;
+            }
+
+            String noun = original.substring(0, original.length() - 1);
+            if (noun.length() < 2 || !TextUtil.isHangulSyllable(noun.charAt(noun.length() - 1))) {
+                continue;
+            }
+
+            String particle = contextualParticleFor(nextWord, noun);
+            if (particle.isBlank()) {
+                continue;
+            }
+
+            addResult(
+                block,
+                text,
+                matcher.start(1),
+                matcher.end(1),
+                original,
+                noun + particle,
+                "Contextual typo candidate: final '디' may be a mistyped Korean particle.",
+                SourceInfo.NONE,
+                results,
+                seen,
+                occupiedSpans
+            );
+        }
+    }
+
+    private String contextualParticleFor(String nextWord, String noun) {
+        if (startsWithPassiveContext(nextWord)) {
+            return TextUtil.hasBatchim(noun.charAt(noun.length() - 1)) ? "이" : "가";
+        }
+        if (startsWithAny(nextWord, OBJECT_CONTEXT_PREFIXES)) {
+            return TextUtil.hasBatchim(noun.charAt(noun.length() - 1)) ? "을" : "를";
+        }
+        return "";
+    }
+
+    private boolean startsWithAny(String value, List<String> prefixes) {
+        for (String prefix : prefixes) {
+            if (value.startsWith(prefix)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean startsWithPassiveContext(String value) {
+        for (String stem : PASSIVE_CONTEXT_STEMS) {
+            if (value.startsWith(stem + "되")
+                || value.startsWith(stem + "된")
+                || value.startsWith(stem + "될")
+                || value.startsWith(stem + "됨")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void addResult(

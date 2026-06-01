@@ -4,10 +4,10 @@ plugins {
 }
 
 group = 'com.techproof'
-version = '0.2.5'
+version = '0.2.6'
 
 java {
-    toolchain { languageVersion = JavaLanguageVersion.of(21) }
+    toolchain { languageVersion = JavaLanguageVersion.of(17) }
 }
 
 application {
@@ -41,6 +41,10 @@ jar {
 
 test {
     useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }
 
 def jpackageExecutable = org.gradle.internal.os.OperatingSystem.current().isWindows() ?
