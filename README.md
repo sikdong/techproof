@@ -4,11 +4,21 @@ TechProof는 Word(`.docx`, `.doc`) 기술 문서에서 조사/맞춤법 오류�
 
 ## 다운로드
 
-- [Windows 설치파일 다운로드 (TechProof-0.2.5.exe)](https://github.com/sikdong/techproof/releases/download/v0.2.5/TechProof-0.2.5.exe)
+- [Windows 설치파일 다운로드 (TechProof-0.2.6.exe)](https://github.com/sikdong/techproof/releases/download/v0.2.6/TechProof-0.2.6.exe)
 
 ## 버전별 변경 사항
 
 <details open>
+<summary>v0.2.6</summary>
+
+- `연산디 수행되고`처럼 `디`가 조사로 잘못 입력된 문맥 기반 오타 후보 탐지 추가
+- 뒤 서술어 문맥에 따라 `이/가`, `을/를` 후보를 구분해 제안
+- `가위디 절단한다`처럼 조사가 여러 방향으로 해석될 수 있는 모호한 문맥은 오탐 방지를 위해 제외
+- Windows 빌드에서 한글 소스/테스트 문자열이 깨지지 않도록 Java 컴파일 인코딩을 UTF-8로 고정
+
+</details>
+
+<details>
 <summary>v0.2.5</summary>
 
 - 도면부호 명칭 추출 범위를 최대 4어절로 확장
@@ -75,6 +85,6 @@ TechProof는 Word(`.docx`, `.doc`) 기술 문서에서 조사/맞춤법 오류�
 
 ## 설치 방법 (Windows)
 
-1. `TechProof-0.2.5.exe`을 실행합니다.
+1. `TechProof-0.2.6.exe`을 실행합니다.
 2. 설치 마법사 안내에 따라 설치를 완료합니다.
 3. 시작 메뉴 또는 바탕화면 바로가기에서 `TechProof`를 실행합니다.
